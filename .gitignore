@@ -1,0 +1,24 @@
+# Secrets — .env.example is the committed one
+.env
+backend/.env
+frontend/.env
+
+# Cache database: regenerates itself on first run
+*.db
+backend/data/cache.db
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+
+# Node
+node_modules/
+dist/
+
+# Editors / OS
+.DS_Store
+.idea/
+.vscode/

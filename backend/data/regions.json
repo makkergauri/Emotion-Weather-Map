@@ -1,0 +1,575 @@
+{
+  "_comment": "Each city carries an explicit `query` string because bare city names are ambiguous to a news search (Birmingham UK vs Birmingham Alabama, Cambridge, Perth, Hamilton...). Countries carry a `query` too: it is used only when NewsAPI has no headlines for that country and the RSS fallback takes over. Bounds are [[south, west], [north, east]] to match Leaflet's LatLngBounds constructor exactly, so the frontend can pass them straight to flyToBounds without reshaping.",
+  "countries": [
+    {
+      "code": "us",
+      "name": "United States",
+      "query": "United States news",
+      "lat": 39.8283,
+      "lng": -98.5795,
+      "bounds": [
+        [
+          24.4,
+          -125.0
+        ],
+        [
+          49.4,
+          -66.9
+        ]
+      ],
+      "cities": [
+        {
+          "name": "New York",
+          "query": "New York City",
+          "lat": 40.7128,
+          "lng": -74.006
+        },
+        {
+          "name": "Los Angeles",
+          "query": "Los Angeles",
+          "lat": 34.0522,
+          "lng": -118.2437
+        },
+        {
+          "name": "Chicago",
+          "query": "Chicago",
+          "lat": 41.8781,
+          "lng": -87.6298
+        },
+        {
+          "name": "Houston",
+          "query": "Houston Texas",
+          "lat": 29.7604,
+          "lng": -95.3698
+        },
+        {
+          "name": "Seattle",
+          "query": "Seattle",
+          "lat": 47.6062,
+          "lng": -122.3321
+        }
+      ]
+    },
+    {
+      "code": "gb",
+      "name": "United Kingdom",
+      "query": "United Kingdom news",
+      "lat": 54.0,
+      "lng": -2.5,
+      "bounds": [
+        [
+          49.9,
+          -8.6
+        ],
+        [
+          58.7,
+          1.8
+        ]
+      ],
+      "cities": [
+        {
+          "name": "London",
+          "query": "London UK",
+          "lat": 51.5072,
+          "lng": -0.1276
+        },
+        {
+          "name": "Manchester",
+          "query": "Manchester UK",
+          "lat": 53.4808,
+          "lng": -2.2426
+        },
+        {
+          "name": "Birmingham",
+          "query": "Birmingham UK",
+          "lat": 52.4862,
+          "lng": -1.8904
+        },
+        {
+          "name": "Edinburgh",
+          "query": "Edinburgh",
+          "lat": 55.9533,
+          "lng": -3.1883
+        },
+        {
+          "name": "Cardiff",
+          "query": "Cardiff Wales",
+          "lat": 51.4816,
+          "lng": -3.1791
+        }
+      ]
+    },
+    {
+      "code": "in",
+      "name": "India",
+      "query": "India news",
+      "lat": 22.0,
+      "lng": 79.0,
+      "bounds": [
+        [
+          8.0,
+          68.1
+        ],
+        [
+          35.5,
+          97.4
+        ]
+      ],
+      "cities": [
+        {
+          "name": "Delhi",
+          "query": "Delhi",
+          "lat": 28.6139,
+          "lng": 77.209
+        },
+        {
+          "name": "Mumbai",
+          "query": "Mumbai",
+          "lat": 19.076,
+          "lng": 72.8777
+        },
+        {
+          "name": "Bangalore",
+          "query": "Bengaluru",
+          "lat": 12.9716,
+          "lng": 77.5946
+        },
+        {
+          "name": "Bhopal",
+          "query": "Bhopal",
+          "lat": 23.2599,
+          "lng": 77.4126
+        },
+        {
+          "name": "Kolkata",
+          "query": "Kolkata",
+          "lat": 22.5726,
+          "lng": 88.3639
+        }
+      ]
+    },
+    {
+      "code": "de",
+      "name": "Germany",
+      "query": "Germany news",
+      "lat": 51.2,
+      "lng": 10.4,
+      "bounds": [
+        [
+          47.3,
+          5.9
+        ],
+        [
+          55.1,
+          15.0
+        ]
+      ],
+      "cities": [
+        {
+          "name": "Berlin",
+          "query": "Berlin Germany",
+          "lat": 52.52,
+          "lng": 13.405
+        },
+        {
+          "name": "Munich",
+          "query": "Munich",
+          "lat": 48.1351,
+          "lng": 11.582
+        },
+        {
+          "name": "Hamburg",
+          "query": "Hamburg Germany",
+          "lat": 53.5511,
+          "lng": 9.9937
+        },
+        {
+          "name": "Frankfurt",
+          "query": "Frankfurt",
+          "lat": 50.1109,
+          "lng": 8.6821
+        },
+        {
+          "name": "Cologne",
+          "query": "Cologne Germany",
+          "lat": 50.9375,
+          "lng": 6.9603
+        }
+      ]
+    },
+    {
+      "code": "jp",
+      "name": "Japan",
+      "query": "Japan news",
+      "lat": 36.5,
+      "lng": 138.2,
+      "bounds": [
+        [
+          31.0,
+          129.5
+        ],
+        [
+          45.5,
+          145.8
+        ]
+      ],
+      "cities": [
+        {
+          "name": "Tokyo",
+          "query": "Tokyo",
+          "lat": 35.6762,
+          "lng": 139.6503
+        },
+        {
+          "name": "Osaka",
+          "query": "Osaka",
+          "lat": 34.6937,
+          "lng": 135.5023
+        },
+        {
+          "name": "Kyoto",
+          "query": "Kyoto",
+          "lat": 35.0116,
+          "lng": 135.7681
+        },
+        {
+          "name": "Sapporo",
+          "query": "Sapporo",
+          "lat": 43.0618,
+          "lng": 141.3545
+        },
+        {
+          "name": "Fukuoka",
+          "query": "Fukuoka",
+          "lat": 33.5904,
+          "lng": 130.4017
+        }
+      ]
+    },
+    {
+      "code": "br",
+      "name": "Brazil",
+      "query": "Brazil news",
+      "lat": -14.2,
+      "lng": -51.9,
+      "bounds": [
+        [
+          -33.7,
+          -73.9
+        ],
+        [
+          5.3,
+          -34.8
+        ]
+      ],
+      "cities": [
+        {
+          "name": "Sao Paulo",
+          "query": "Sao Paulo Brazil",
+          "lat": -23.5505,
+          "lng": -46.6333
+        },
+        {
+          "name": "Rio de Janeiro",
+          "query": "Rio de Janeiro",
+          "lat": -22.9068,
+          "lng": -43.1729
+        },
+        {
+          "name": "Brasilia",
+          "query": "Brasilia",
+          "lat": -15.7975,
+          "lng": -47.8919
+        },
+        {
+          "name": "Salvador",
+          "query": "Salvador Bahia",
+          "lat": -12.9777,
+          "lng": -38.5016
+        },
+        {
+          "name": "Belo Horizonte",
+          "query": "Belo Horizonte",
+          "lat": -19.9167,
+          "lng": -43.9345
+        }
+      ]
+    },
+    {
+      "code": "au",
+      "name": "Australia",
+      "query": "Australia news",
+      "lat": -25.3,
+      "lng": 133.8,
+      "bounds": [
+        [
+          -43.6,
+          113.3
+        ],
+        [
+          -10.7,
+          153.6
+        ]
+      ],
+      "cities": [
+        {
+          "name": "Sydney",
+          "query": "Sydney Australia",
+          "lat": -33.8688,
+          "lng": 151.2093
+        },
+        {
+          "name": "Melbourne",
+          "query": "Melbourne Australia",
+          "lat": -37.8136,
+          "lng": 144.9631
+        },
+        {
+          "name": "Brisbane",
+          "query": "Brisbane",
+          "lat": -27.4698,
+          "lng": 153.0251
+        },
+        {
+          "name": "Perth",
+          "query": "Perth Australia",
+          "lat": -31.9523,
+          "lng": 115.8613
+        },
+        {
+          "name": "Adelaide",
+          "query": "Adelaide",
+          "lat": -34.9285,
+          "lng": 138.6007
+        }
+      ]
+    },
+    {
+      "code": "ca",
+      "name": "Canada",
+      "query": "Canada news",
+      "lat": 56.1,
+      "lng": -106.3,
+      "bounds": [
+        [
+          42.0,
+          -141.0
+        ],
+        [
+          70.0,
+          -52.6
+        ]
+      ],
+      "cities": [
+        {
+          "name": "Toronto",
+          "query": "Toronto",
+          "lat": 43.6532,
+          "lng": -79.3832
+        },
+        {
+          "name": "Vancouver",
+          "query": "Vancouver",
+          "lat": 49.2827,
+          "lng": -123.1207
+        },
+        {
+          "name": "Montreal",
+          "query": "Montreal",
+          "lat": 45.5019,
+          "lng": -73.5674
+        },
+        {
+          "name": "Calgary",
+          "query": "Calgary",
+          "lat": 51.0447,
+          "lng": -114.0719
+        },
+        {
+          "name": "Ottawa",
+          "query": "Ottawa",
+          "lat": 45.4215,
+          "lng": -75.6972
+        }
+      ]
+    },
+    {
+      "code": "fr",
+      "name": "France",
+      "query": "France news",
+      "lat": 46.6,
+      "lng": 2.5,
+      "bounds": [
+        [
+          41.3,
+          -5.1
+        ],
+        [
+          51.1,
+          9.6
+        ]
+      ],
+      "cities": [
+        {
+          "name": "Paris",
+          "query": "Paris France",
+          "lat": 48.8566,
+          "lng": 2.3522
+        },
+        {
+          "name": "Marseille",
+          "query": "Marseille",
+          "lat": 43.2965,
+          "lng": 5.3698
+        },
+        {
+          "name": "Lyon",
+          "query": "Lyon France",
+          "lat": 45.764,
+          "lng": 4.8357
+        },
+        {
+          "name": "Toulouse",
+          "query": "Toulouse",
+          "lat": 43.6047,
+          "lng": 1.4442
+        },
+        {
+          "name": "Nice",
+          "query": "Nice France",
+          "lat": 43.7102,
+          "lng": 7.262
+        }
+      ]
+    },
+    {
+      "code": "za",
+      "name": "South Africa",
+      "query": "South Africa news",
+      "lat": -30.6,
+      "lng": 22.9,
+      "bounds": [
+        [
+          -34.8,
+          16.5
+        ],
+        [
+          -22.1,
+          32.9
+        ]
+      ],
+      "cities": [
+        {
+          "name": "Johannesburg",
+          "query": "Johannesburg",
+          "lat": -26.2041,
+          "lng": 28.0473
+        },
+        {
+          "name": "Cape Town",
+          "query": "Cape Town",
+          "lat": -33.9249,
+          "lng": 18.4241
+        },
+        {
+          "name": "Durban",
+          "query": "Durban",
+          "lat": -29.8587,
+          "lng": 31.0218
+        },
+        {
+          "name": "Pretoria",
+          "query": "Pretoria",
+          "lat": -25.7479,
+          "lng": 28.2293
+        },
+        {
+          "name": "Gqeberha",
+          "query": "Gqeberha Port Elizabeth",
+          "lat": -33.9608,
+          "lng": 25.6022
+        }
+      ]
+    },
+    {
+      "code": "ae",
+      "name": "United Arab Emirates",
+      "query": "United Arab Emirates news",
+      "lat": 24.0,
+      "lng": 54.0,
+      "bounds": [
+        [
+          22.6,
+          51.5
+        ],
+        [
+          26.1,
+          56.4
+        ]
+      ],
+      "cities": [
+        {
+          "name": "Dubai",
+          "query": "Dubai",
+          "lat": 25.2048,
+          "lng": 55.2708
+        },
+        {
+          "name": "Abu Dhabi",
+          "query": "Abu Dhabi",
+          "lat": 24.4539,
+          "lng": 54.3773
+        },
+        {
+          "name": "Sharjah",
+          "query": "Sharjah",
+          "lat": 25.3463,
+          "lng": 55.4209
+        },
+        {
+          "name": "Al Ain",
+          "query": "Al Ain",
+          "lat": 24.2075,
+          "lng": 55.7447
+        }
+      ]
+    },
+    {
+      "code": "sg",
+      "name": "Singapore",
+      "query": "Singapore news",
+      "lat": 1.3521,
+      "lng": 103.8198,
+      "bounds": [
+        [
+          1.16,
+          103.6
+        ],
+        [
+          1.47,
+          104.1
+        ]
+      ],
+      "cities": [
+        {
+          "name": "Orchard",
+          "query": "Orchard Road Singapore",
+          "lat": 1.3048,
+          "lng": 103.8318
+        },
+        {
+          "name": "Jurong",
+          "query": "Jurong Singapore",
+          "lat": 1.3329,
+          "lng": 103.7436
+        },
+        {
+          "name": "Changi",
+          "query": "Changi Singapore",
+          "lat": 1.3644,
+          "lng": 103.9915
+        }
+      ]
+    }
+  ]
+}

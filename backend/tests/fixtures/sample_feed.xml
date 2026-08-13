@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:media="http://search.yahoo.com/mrss/">
+  <channel>
+    <generator>NFE/5.0</generator>
+    <title>"Bhopal" - Google News</title>
+    <link>https://news.google.com/search?q=Bhopal&amp;hl=en</link>
+    <language>en</language>
+    <description>Google News</description>
+    <item>
+      <title>Bhopal metro trial run draws cheering crowds along the new corridor - The Times of India</title>
+      <link>https://news.google.com/rss/articles/CBMiexample01</link>
+      <guid isPermaLink="false">CBMiexample01</guid>
+      <pubDate>Tue, 11 Aug 2026 06:12:00 GMT</pubDate>
+      <description>&lt;a href="https://news.google.com/rss/articles/CBMiexample01"&gt;Bhopal metro trial run draws cheering crowds&lt;/a&gt;</description>
+      <source url="https://timesofindia.indiatimes.com">The Times of India</source>
+    </item>
+    <item>
+      <title>Heavy rain floods low-lying areas of Bhopal, disrupting traffic for hours - Hindustan Times</title>
+      <link>https://news.google.com/rss/articles/CBMiexample02</link>
+      <guid isPermaLink="false">CBMiexample02</guid>
+      <pubDate>Tue, 11 Aug 2026 04:40:00 GMT</pubDate>
+      <source url="https://www.hindustantimes.com">Hindustan Times</source>
+    </item>
+    <item>
+      <title>New public library opens in Bhopal to warm reviews from residents - Free Press Journal</title>
+      <link>https://news.google.com/rss/articles/CBMiexample03</link>
+      <guid isPermaLink="false">CBMiexample03</guid>
+      <pubDate>Mon, 10 Aug 2026 18:05:00 GMT</pubDate>
+    </item>
+    <item>
+      <title></title>
+      <link>https://news.google.com/rss/articles/CBMiexample04</link>
+      <guid isPermaLink="false">CBMiexample04</guid>
+      <pubDate>Mon, 10 Aug 2026 17:00:00 GMT</pubDate>
+      <source url="https://example.com">Example Wire</source>
+    </item>
+    <item>
+      <title><![CDATA[Bhopal gas tragedy survivors protest delays in compensation & care]]></title>
+      <link>https://news.google.com/rss/articles/CBMiexample05</link>
+      <guid isPermaLink="false">CBMiexample05</guid>
+      <pubDate>Mon, 10 Aug 2026 12:30:00 GMT</pubDate>
+      <source url="https://www.thehindu.com">The Hindu</source>
+    </item>
+  </channel>
+</rss>

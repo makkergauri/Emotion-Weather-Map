@@ -1,0 +1,806 @@
+/* ============================================================================
+   Emotion Weather — global styles
+
+   The visual language is borrowed from meteorological instruments rather than
+   from dashboards: a night-atmosphere ground, contour-line rules, condensed
+   labels, and monospace readouts. The one flourish is the station strip, the
+   monospace line of codes that appears under every region name. Everything else
+   stays quiet so that strip and the animated icons carry the personality.
+
+   Colour is a diverging scale, warm through slate to cold, so the map is
+   readable as a temperature chart even before you decode the icons.
+   ========================================================================= */
+
+:root {
+  /* Ground and structure */
+  --ink-deep: #060d14;
+  --ink: #0a141e;
+  --surface: #10202d;
+  --surface-raised: #16293a;
+  --isobar: #21384a;
+  --isobar-bright: #35566e;
+
+  /* Text */
+  --paper: #e6eef3;
+  --haze: #7e9aaf;
+  --haze-dim: #56718a;
+
+  /* Conditions — warm to cold, matching the sentiment axis */
+  --sunny: #f5b342;
+  --partly-cloudy: #d9c77c;
+  --overcast: #8ea3b0;
+  --rainy: #4e9bd6;
+  --thunderstorm: #7b6bf0;
+  --no-data: #3b4e5c;
+
+  /* Type */
+  --font-display: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+  --font-body: 'IBM Plex Sans', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+
+  /* Rhythm */
+  --gap-xs: 4px;
+  --gap-sm: 8px;
+  --gap: 16px;
+  --gap-lg: 24px;
+  --radius: 3px;
+
+  --panel-width: 384px;
+  --header-height: 64px;
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--ink-deep);
+  color: var(--paper);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+:focus-visible {
+  outline: 2px solid var(--sunny);
+  outline-offset: 2px;
+}
+
+/* A shared label treatment: small, condensed, widely tracked. Used for every
+   eyebrow and column head so the interface has one voice for metadata. */
+.eyebrow {
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--haze-dim);
+}
+
+/* The signature element: a station report line. Monospace, dot-separated, the
+   same grammar wherever it appears — header, panel, legend. */
+.station-strip {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--haze);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.station-strip b {
+  font-weight: 500;
+  color: var(--paper);
+}
+
+.station-strip .sep {
+  color: var(--isobar-bright);
+  padding: 0 6px;
+}
+
+/* ---------------------------------------------------------------- app frame */
+
+.app {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* ------------------------------------------------------------------- header */
+
+.header {
+  position: absolute;
+  inset: 0 0 auto 0;
+  z-index: 1000; /* above Leaflet panes, which top out at 800 */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gap);
+  height: var(--header-height);
+  padding: 0 var(--gap-lg);
+  background: linear-gradient(to bottom, rgba(6, 13, 20, 0.94), rgba(6, 13, 20, 0));
+  pointer-events: none;
+}
+
+.header > * {
+  pointer-events: auto;
+}
+
+.wordmark {
+  display: flex;
+  align-items: baseline;
+  gap: var(--gap-sm);
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.wordmark small {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  color: var(--haze-dim);
+  text-transform: none;
+}
+
+/* ------------------------------------------------------------- global mood */
+
+.global-mood {
+  display: flex;
+  align-items: center;
+  gap: var(--gap);
+  padding: var(--gap-sm) var(--gap);
+  background: rgba(16, 32, 45, 0.88);
+  border: 1px solid var(--isobar);
+  border-radius: var(--radius);
+  backdrop-filter: blur(6px);
+}
+
+.global-mood__readout {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.global-mood__label {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  line-height: 1.1;
+}
+
+/* A barometer, not a progress bar: the needle sits on a fixed -1..+1 scale with
+   a marked centre, so a score's position means something absolute. */
+.barometer {
+  position: relative;
+  width: 132px;
+  height: 6px;
+  background: linear-gradient(
+    to right,
+    var(--thunderstorm),
+    var(--rainy),
+    var(--overcast),
+    var(--partly-cloudy),
+    var(--sunny)
+  );
+  border-radius: 999px;
+  opacity: 0.85;
+}
+
+.barometer__centre {
+  position: absolute;
+  top: -3px;
+  bottom: -3px;
+  left: 50%;
+  width: 1px;
+  background: var(--ink-deep);
+}
+
+.barometer__needle {
+  position: absolute;
+  top: -4px;
+  width: 2px;
+  height: 14px;
+  background: var(--paper);
+  border-radius: 1px;
+  transform: translateX(-1px);
+  transition: left 700ms var(--ease-out);
+}
+
+/* --------------------------------------------------------------- breadcrumb */
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-xs);
+  font-family: var(--font-display);
+  font-size: 14px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.breadcrumb__crumb {
+  padding: 2px 4px;
+  color: var(--haze);
+  border-radius: var(--radius);
+  transition: color 160ms ease;
+}
+
+.breadcrumb__crumb:hover {
+  color: var(--paper);
+}
+
+.breadcrumb__crumb--current {
+  color: var(--paper);
+  cursor: default;
+}
+
+.breadcrumb__sep {
+  color: var(--isobar-bright);
+}
+
+/* ---------------------------------------------------------------------- map */
+
+.map {
+  height: 100%;
+  width: 100%;
+  background: var(--ink-deep);
+}
+
+/* Leaflet ships light-mode chrome; these bring its controls into the palette. */
+.leaflet-container {
+  background: var(--ink-deep);
+  font-family: var(--font-body);
+}
+
+.leaflet-control-attribution {
+  background: rgba(6, 13, 20, 0.8) !important;
+  color: var(--haze-dim) !important;
+  font-size: 10px !important;
+}
+
+.leaflet-control-attribution a {
+  color: var(--haze) !important;
+}
+
+.leaflet-bar a {
+  background: var(--surface) !important;
+  color: var(--paper) !important;
+  border-bottom-color: var(--isobar) !important;
+}
+
+.leaflet-bar a:hover {
+  background: var(--surface-raised) !important;
+}
+
+/* ------------------------------------------------------------------ markers */
+
+/* Leaflet's own div-icon class paints a white box; this replaces it entirely. */
+.marker-shell {
+  background: none;
+  border: none;
+}
+
+.marker {
+  position: relative;
+  display: grid;
+  place-items: center;
+  height: 100%;
+}
+
+.marker__button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 0;
+  transition: transform 220ms var(--ease-out);
+}
+
+.marker__button:hover {
+  transform: translateY(-2px) scale(1.06);
+}
+
+/* The glow is the confidence signal: strong feeling in a well-covered region
+   reads as a halo, thin coverage stays flat. Radius is set inline per marker. */
+.marker__glow {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.marker__label {
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--paper);
+  text-shadow: 0 1px 3px var(--ink-deep), 0 0 8px var(--ink-deep);
+  white-space: nowrap;
+}
+
+.marker--low-confidence .marker__label,
+.marker--low-confidence .weather-icon {
+  opacity: 0.55;
+}
+
+.marker--selected .marker__label {
+  color: var(--sunny);
+}
+
+/* Countries recede rather than vanish once you're inside one, so the drill-down
+   still reads as a place on the same map. */
+.marker--receded {
+  opacity: 0.28;
+  transition: opacity 400ms ease;
+}
+
+/* ------------------------------------------------------- weather icon motion */
+
+.weather-icon {
+  display: block;
+  overflow: visible;
+}
+
+/* Opt-out for dense contexts — the forecast strip and the legend would
+   otherwise run a dozen loops in a space the size of a business card. */
+.weather-icon--still .ewm-rays,
+.weather-icon--still .ewm-cloud,
+.weather-icon--still .ewm-drop,
+.weather-icon--still .ewm-bolt {
+  animation: none;
+}
+
+@keyframes ewm-pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(0.94);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.06);
+  }
+}
+
+@keyframes ewm-drift {
+  0%,
+  100% {
+    transform: translateX(-1.5px);
+  }
+  50% {
+    transform: translateX(1.5px);
+  }
+}
+
+@keyframes ewm-fall {
+  0% {
+    opacity: 0;
+    transform: translateY(-3px);
+  }
+  25% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(9px);
+  }
+}
+
+@keyframes ewm-flash {
+  0%,
+  88%,
+  100% {
+    opacity: 0.35;
+  }
+  90%,
+  96% {
+    opacity: 1;
+  }
+}
+
+/* transform-box/origin keep the scaling centred on each element's own box
+   rather than the SVG's top-left corner, which is the default and looks broken. */
+.ewm-rays,
+.ewm-cloud,
+.ewm-drop,
+.ewm-bolt {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.ewm-rays {
+  animation: ewm-pulse 3.6s ease-in-out infinite;
+}
+
+.ewm-cloud {
+  animation: ewm-drift 7s ease-in-out infinite;
+}
+
+.ewm-drop {
+  animation: ewm-fall 1.4s linear infinite;
+}
+
+.ewm-drop--2 {
+  animation-delay: 0.45s;
+}
+
+.ewm-drop--3 {
+  animation-delay: 0.9s;
+}
+
+.ewm-bolt {
+  animation: ewm-flash 4s ease-in-out infinite;
+}
+
+/* -------------------------------------------------------------- side panel */
+
+.panel {
+  position: absolute;
+  /* Starts below the header rather than at the top of the viewport: at full
+     height it covered the planet-mood readout, hiding exactly the "how many
+     countries are reporting" figure you need when the map looks wrong. */
+  top: var(--header-height);
+  right: 0;
+  bottom: 0;
+  z-index: 1100;
+  display: flex;
+  flex-direction: column;
+  width: var(--panel-width);
+  background: var(--ink);
+  border-left: 1px solid var(--isobar);
+  box-shadow: -24px 0 48px rgba(3, 8, 13, 0.55);
+  animation: panel-in 320ms var(--ease-out);
+}
+
+@keyframes panel-in {
+  from {
+    transform: translateX(24px);
+    opacity: 0;
+  }
+}
+
+.panel__head {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--gap);
+  padding: var(--gap-lg);
+  border-bottom: 1px solid var(--isobar);
+}
+
+.panel__titles {
+  min-width: 0;
+  flex: 1;
+}
+
+.panel__region {
+  margin: 2px 0 0;
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.panel__condition {
+  margin: var(--gap-sm) 0 var(--gap-xs);
+  font-family: var(--font-display);
+  font-size: 18px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.panel__close {
+  position: absolute;
+  top: var(--gap);
+  right: var(--gap);
+  width: 28px;
+  height: 28px;
+  color: var(--haze);
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  transition: color 160ms ease, border-color 160ms ease;
+}
+
+.panel__close:hover {
+  color: var(--paper);
+  border-color: var(--isobar);
+}
+
+.panel__body {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--gap-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-lg);
+}
+
+.panel__section > .eyebrow {
+  display: block;
+  margin-bottom: var(--gap-sm);
+}
+
+.panel__note {
+  margin: 0;
+  font-size: 13px;
+  color: var(--haze);
+}
+
+/* ---------------------------------------------------------- forecast strip */
+
+.forecast {
+  display: flex;
+  gap: 6px;
+}
+
+.forecast__day {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--gap-xs);
+  padding: var(--gap-sm) 2px;
+  background: var(--surface);
+  border: 1px solid var(--isobar);
+  border-radius: var(--radius);
+}
+
+.forecast__day--today {
+  border-color: var(--isobar-bright);
+  background: var(--surface-raised);
+}
+
+.forecast__weekday {
+  font-family: var(--font-display);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--haze-dim);
+}
+
+.forecast__score {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--haze);
+}
+
+/* ---------------------------------------------------------------- headlines */
+
+.headlines {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.headline {
+  display: flex;
+  gap: var(--gap-sm);
+  padding: var(--gap) 0;
+  border-top: 1px solid var(--isobar);
+}
+
+.headline:first-child {
+  border-top: none;
+  padding-top: 0;
+}
+
+/* A vertical bar coloured and sized by the headline's own score: the panel then
+   shows not just which stories drive the weather but how hard each one pushes. */
+.headline__gauge {
+  flex: none;
+  width: 3px;
+  border-radius: 999px;
+  align-self: stretch;
+}
+
+.headline__text {
+  min-width: 0;
+}
+
+.headline__title {
+  margin: 0 0 var(--gap-xs);
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.headline__title a {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+}
+
+.headline__title a:hover {
+  border-bottom-color: var(--isobar-bright);
+}
+
+.headline__meta {
+  display: flex;
+  gap: var(--gap-sm);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--haze-dim);
+}
+
+/* -------------------------------------------------------------- city links */
+
+.city-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap-sm);
+}
+
+.city-chip {
+  padding: 5px 10px;
+  font-family: var(--font-display);
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--haze);
+  background: var(--surface);
+  border: 1px solid var(--isobar);
+  border-radius: var(--radius);
+  transition: color 160ms ease, border-color 160ms ease, background 160ms ease;
+}
+
+.city-chip:hover {
+  color: var(--paper);
+  background: var(--surface-raised);
+  border-color: var(--isobar-bright);
+}
+
+/* ------------------------------------------------------------------- legend */
+
+.legend {
+  position: absolute;
+  left: var(--gap-lg);
+  bottom: var(--gap-lg);
+  z-index: 1000;
+  padding: var(--gap) var(--gap);
+  background: rgba(10, 20, 30, 0.9);
+  border: 1px solid var(--isobar);
+  border-radius: var(--radius);
+  backdrop-filter: blur(6px);
+}
+
+.legend__rows {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: var(--gap-sm);
+}
+
+.legend__row {
+  display: grid;
+  cursor: help;
+  grid-template-columns: 22px 104px auto;
+  align-items: center;
+  gap: var(--gap-sm);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--haze);
+}
+
+.legend__name {
+  font-family: var(--font-display);
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--paper);
+}
+
+/* --------------------------------------------------------- status messages */
+
+.status {
+  position: absolute;
+  top: calc(var(--header-height) + var(--gap));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  padding: var(--gap-sm) var(--gap);
+  background: rgba(16, 32, 45, 0.94);
+  border: 1px solid var(--isobar);
+  border-radius: var(--radius);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--haze);
+}
+
+.status--error {
+  border-color: #6d3a3a;
+  color: #e8a9a9;
+}
+
+.status__retry {
+  margin-left: var(--gap-sm);
+  color: var(--sunny);
+  text-decoration: underline;
+}
+
+/* Small pulsing dot for "fetching", quieter than a spinner. */
+.status__dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-right: var(--gap-sm);
+  background: var(--sunny);
+  border-radius: 50%;
+  animation: ewm-pulse 1.6s ease-in-out infinite;
+}
+
+/* --------------------------------------------------------------- responsive */
+
+@media (max-width: 860px) {
+  .header {
+    height: auto;
+    padding: var(--gap-sm) var(--gap);
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--gap-sm);
+  }
+
+  .legend {
+    display: none; /* the panel explains the scale; the map needs the room */
+  }
+
+  /* Panel becomes a bottom sheet — a 384px rail is most of a phone screen. */
+  .panel {
+    top: auto;
+    left: 0;
+    width: 100%;
+    max-height: 62vh;
+    border-left: none;
+    border-top: 1px solid var(--isobar);
+    border-radius: 8px 8px 0 0;
+    animation: sheet-in 320ms var(--ease-out);
+  }
+
+  @keyframes sheet-in {
+    from {
+      transform: translateY(24px);
+      opacity: 0;
+    }
+  }
+}
+
+/* --------------------------------------------------------- reduced motion */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
