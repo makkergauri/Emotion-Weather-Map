@@ -1,0 +1,28 @@
+# Keeps the Render free-tier backend awake.
+#
+# Render sleeps a free service after 15 idle minutes, and waking it takes the
+# best part of a minute — a poor first impression for someone opening the link
+# from a CV. A ping every ten minutes keeps it warm. One always-on service uses
+# about 744 of Render's 750 free monthly hours, so this fits, just.
+#
+# Two caveats worth knowing: GitHub may delay scheduled runs under load, and it
+# disables scheduled workflows on repositories with no activity for 60 days.
+# Push a commit, or re-enable it from the Actions tab, if the site starts
+# sleeping again.
+
+name: Keep backend awake
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch: # lets you trigger a ping by hand from the Actions tab
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    # Skip quietly until BACKEND_URL is configured, rather than failing every
+    # ten minutes and filling an inbox with alerts.
+    if: ${{ vars.BACKEND_URL != '' }}
+    steps:
+      - name: Ping the health endpoint
+        run: curl --fail --silent --show-error --max-time 90 "${{ vars.BACKEND_URL }}/api/health"
