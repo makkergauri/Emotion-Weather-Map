@@ -5,6 +5,16 @@ headlines and drawn as weather — sun for good news, overcast for flat news,
 thunderstorms for bad. Click a country and the camera flies in; the pin breaks
 apart into cities that fill in one by one.
 
+The whole idea rests on one thing: everyone can already read a weather map. Nobody
+needs to be told that a storm over Johannesburg is worse than light cloud over
+Osaka.
+
+**Live demo: [your-project.vercel.app](https://your-project.vercel.app)**
+
+![World view](docs/img/world.png)
+![Drilled into a country](docs/img/drilldown.png)
+
+---
 
 ## Running it
 
@@ -18,6 +28,18 @@ You need Python 3.11+ and Node 18+.
 That handles the virtual environment, both installs, and starting both servers.
 Then open <http://localhost:5173>. `Ctrl+C` stops everything.
 
+Prefer to do it by hand? Two terminals:
+
+```bash
+cd backend && python -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+cp .env.example .env
+uvicorn app.main:app --reload
+```
+
+```bash
+cd frontend && npm install && npm run dev
+```
 
 ### About the API key
 
@@ -28,6 +50,11 @@ source each reading came from. A key buys you better country data, not the
 difference between working and broken.
 
 Never put the key in `.env.example`. That file gets committed; `.env` doesn't.
+
+### Deploying
+
+Frontend on Vercel, backend on Render, both free. Step by step in
+[docs/deploying.md](docs/deploying.md).
 
 ---
 
@@ -68,7 +95,7 @@ reproduces a country's front page. Details in
 
 ```bash
 cd backend  && python -m pytest    # 124
-cd frontend && npm test            # 32
+cd frontend && npm test            # 36
 ```
 
 The score-to-weather mapping is tested exhaustively, since it's pure logic over a
@@ -96,3 +123,24 @@ inside the terms of most free news tiers.
 and the testing surface without making the idea any clearer.
 
 ---
+
+## Layout
+
+```
+backend/app/
+  main.py        routes
+  pipeline.py    when to fetch, and what to do when it fails
+  fetchers/      NewsAPI and Google News RSS
+  sentiment/     scoring and averaging
+  mapping/       score to weather condition
+  cache/         SQLite, TTL, daily snapshots
+
+frontend/src/
+  App.tsx        navigation state
+  components/    map, drill-down, panel, icons
+  hooks/         every backend call
+```
+
+A few modules — `pipeline.py`, `config.py`, `regions.py`, `conditions.ts` — aren't
+in the original spec. They exist to keep orchestration out of the routing table
+and to give shared constants one home instead of three.

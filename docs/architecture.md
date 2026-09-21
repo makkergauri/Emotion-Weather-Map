@@ -201,3 +201,30 @@ retheming is a change in one block. The one duplication across the stack is the
 threshold values in `conditions.ts`, which the legend needs in order to state the
 scale it's explaining — shipping a config endpoint to move four numbers would be
 worse than the duplication.
+
+
+---
+
+## Manual checklist
+
+Leaflet needs a real viewport, so the map can't be meaningfully unit tested. Walk
+this before calling a change done:
+
+- [ ] Twelve pins, each with a weather icon and country name
+- [ ] Icons animate — rain falls, sun rays pulse, clouds drift
+- [ ] Strong sentiment glows brighter; low-confidence pins look dimmer
+- [ ] Clicking a country flies the camera in smoothly rather than jumping
+- [ ] City pins appear and fill in one by one from grey
+- [ ] Other countries recede but stay visible
+- [ ] Panel shows condition, score, headlines with sources, and the 7-day strip
+- [ ] Headline links open the publisher in a new tab
+- [ ] Breadcrumb reads `World / India`, then `World / India / Bhopal`
+- [ ] Zooming all the way out returns the breadcrumb to `World`
+- [ ] `Escape` steps out one level at a time
+- [ ] Closing the panel leaves the camera where it is
+- [ ] On a cold backend, grey pins fill in without reloading the page
+- [ ] An unreachable country shows a dashed grey pin and an explanation
+- [ ] The station strip names its source (`SRC NEWSAPI` or `SRC RSS`)
+- [ ] The panel doesn't cover the planet-mood readout
+- [ ] At mobile width the panel becomes a bottom sheet
+- [ ] With reduced motion enabled, transitions are instant and icons hold still
