@@ -1,146 +1,108 @@
 # Emotion Weather Map
 
-A weather map of the news. Twelve countries, scored on the mood of their current
-headlines and drawn as weather — sun for good news, overcast for flat news,
-thunderstorms for bad. Click a country and the camera flies in; the pin breaks
-apart into cities that fill in one by one.
+> A world map that turns news-headline sentiment into weather — sun for good news,
+> storms for bad — across 12 countries and 57 cities, rebuilt live from Google News
+> every four hours.
 
-The whole idea rests on one thing: everyone can already read a weather map. Nobody
-needs to be told that a storm over Johannesburg is worse than light cloud over
-Osaka.
-
-**Live demo: [your-project.vercel.app](https://your-project.vercel.app)**
-
-![World view](docs/img/world.png)
-![Drilled into a country](docs/img/drilldown.png)
+**[Live demo](https://emotion-weather-map.vercel.app)** · **[Source](https://github.com/makkergauri/Emotion-Weather-Map)**
 
 ---
 
-## Running it
+## The problem
 
-You need Python 3.11+ and Node 18+.
+Sentiment analysis usually ends in a table of numbers, and nobody reads a table of
+numbers for fun. Comparing the tone of news across countries means reading dozens of
+feeds at once. On top of that, free news APIs are rate-limited, uneven in which
+countries they cover, and offer no city-level search at all.
 
-```bash
-./dev.sh          # macOS / Linux
-.\dev.ps1         # Windows PowerShell
-```
+## Approach
 
-That handles the virtual environment, both installs, and starting both servers.
-Then open <http://localhost:5173>. `Ctrl+C` stops everything.
+Weather is a scale everyone already reads without a legend, so each region's average
+headline sentiment is mapped onto one of five conditions and drawn on a map. The key
+engineering decisions sit behind that:
 
-Prefer to do it by hand? Two terminals:
-
-```bash
-cd backend && python -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
-cp .env.example .env
-uvicorn app.main:app --reload
-```
-
-```bash
-cd frontend && npm install && npm run dev
-```
-
-### About the API key
-
-Grab a free one from [newsapi.org](https://newsapi.org/register) and paste it into
-`backend/.env`. But it's optional — countries NewsAPI can't serve fall back to a
-Google News RSS search, which needs no key at all. The panel tells you which
-source each reading came from. A key buys you better country data, not the
-difference between working and broken.
-
-Never put the key in `.env.example`. That file gets committed; `.env` doesn't.
-
-### Deploying
-
-Frontend on Vercel, backend on Render, both free. Step by step in
-[docs/deploying.md](docs/deploying.md).
-
----
-
-## How it works
+- **Two sources with a fallback.** NewsAPI serves country front pages. Google News RSS
+  covers cities, which no free API offers, and takes over for any country NewsAPI has
+  no coverage for. Each reading records which source it came from, and the UI shows it.
+- **A cache that makes free tiers workable.** Readings are stored in SQLite for four
+  hours, so external calls scale with time rather than with visitors.
+- **Failure that stays honest.** An unreachable region shows as a grey "no data" pin,
+  never as a misleading neutral reading, and a failed fetch never overwrites a good one.
 
 ```mermaid
 flowchart LR
-    NA[NewsAPI] --> FET[fetchers]
-    RSS[Google News RSS] --> FET
-    FET --> SENT[VADER sentiment] --> MAP[score to weather] --> DB[(SQLite, 4h TTL)]
-    DB --> API[FastAPI] --> UI[React + Leaflet]
+    A[NewsAPI] --> C[Fetch + fallback]
+    B[Google News RSS] --> C
+    C --> D[Dedupe + VADER scoring]
+    D --> E[Score to weather]
+    E --> F[(SQLite cache, 4h)]
+    F --> G[FastAPI]
+    G --> H[React + Leaflet map]
 ```
 
-Headlines come in, get deduplicated, scored one by one, and averaged. That average
-lands in one of five bands and becomes the region's weather. Everything is cached
-for four hours, which is what keeps a free-tier API key alive under real traffic.
+## Results
 
-Two sources, because no free news API offers a city parameter and no RSS search
-reproduces a country's front page. Details in
-[docs/methodology.md](docs/methodology.md) and
-[docs/architecture.md](docs/architecture.md).
+| Metric | Value | How it was measured |
+|---|---|---|
+| Coverage | 12 countries, 57 cities | Count of entries in `backend/data/regions.json` |
+| Backend tests | 124 passing | `python -m pytest` in `backend/` |
+| Frontend tests | 36 passing | `npm test` in `frontend/` |
+| Max NewsAPI usage | 72 requests/day | 12 countries × 6 refreshes a day at the 4-hour TTL; the TTL boundary is covered by tests using an injected clock |
+| JS bundle | 385 kB (120 kB gzipped) | `npm run build` output in `frontend/` |
 
----
+**How to reproduce:** run the two test commands above; `npm run build` prints the
+bundle size.
 
-## API
+There's no accuracy figure, deliberately. There's no labelled ground truth for "the
+mood of a country's news", so any accuracy number would be invented. What's tested
+instead is the pipeline's behaviour: the score-to-weather mapping (exhaustively),
+caching, RSS parsing against a saved feed, and graceful degradation when sources fail.
 
-| Endpoint | Returns |
-| --- | --- |
-| `/api/countries` | All twelve, with condition and score |
-| `/api/countries/{code}` | Headlines driving the score, 7-day trend, cities |
-| `/api/cities/{city}?country={code}` | City condition, score, headlines |
-| `/api/global-summary` | Planet mood, brightest and darkest country |
-| `/api/health` | Cache state — first place to look when the map is blank |
+**Limitations:**
 
----
+- **Headline sentiment is not public opinion.** It's the tone of what editors chose to
+  publish, and newsrooms select for conflict, so every country reads darker than it
+  lives. Comparing countries is meaningful; one score in isolation isn't.
+- **VADER reads words, not context.** It misses sarcasm and negation, and only handles
+  English, which skews coverage of Japan, Brazil, Germany and France.
+- **The weather thresholds are hand-set**, reasoned in `docs/methodology.md` rather than
+  validated against data.
+- **Free hosting:** the backend can take up to a minute to wake after idling, and the
+  cache resets on each deploy, so the 7-day trend strip restarts empty.
 
-## Tests
+## Tech stack
+
+- **Backend:** Python 3.11, FastAPI, httpx, feedparser, VADER sentiment (optional
+  DistilBERT mode), SQLite, pytest
+- **Frontend:** React 18, TypeScript, Vite, Leaflet via react-leaflet, Vitest and
+  Testing Library
+- **Deployment:** Render (backend), Vercel (frontend), a GitHub Actions keep-alive ping
+- **Data:** Google News RSS, NewsAPI (optional), CARTO basemap tiles
+
+## Running it
+
+Prerequisites: Python 3.11+, Node 18+. A [NewsAPI key](https://newsapi.org/register)
+and a [CARTO key](https://carto.com/basemaps/apikey) are both free and both optional:
+without NewsAPI every region uses RSS, and without CARTO the map tiles carry a
+watermark.
 
 ```bash
-cd backend  && python -m pytest    # 124
-cd frontend && npm test            # 36
+git clone https://github.com/makkergauri/Emotion-Weather-Map.git
+cd Emotion-Weather-Map
+
+# Backend
+cd backend
+python -m venv .venv
+source .venv/bin/activate        # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+cp .env.example .env             # optionally add NEWS_API_KEY
+uvicorn app.main:app --reload
+
+# Frontend, in a second terminal
+cd frontend
+npm install
+npm run dev                      # open http://localhost:5173
 ```
 
-The score-to-weather mapping is tested exhaustively, since it's pure logic over a
-bounded range. The cache's four-hour refresh rule is tested with an injected clock
-rather than a real four-hour wait. RSS parsing runs against a saved feed, so no
-test touches the network.
-
-The map itself needs a real browser, so there's a manual checklist at the bottom
-of [docs/architecture.md](docs/architecture.md).
-
----
-
-## What this isn't
-
-**It doesn't measure public opinion.** It measures the mood of what editors chose
-to publish, read one sentence at a time by a model that doesn't understand
-sarcasm. Newsrooms select for conflict everywhere, so every country reads darker
-than it lives. Comparing countries to each other is meaningful; reading a single
-score as a verdict on a place is not.
-
-**It only stores headlines and source names.** No article bodies, which keeps it
-inside the terms of most free news tiers.
-
-**Twelve countries is on purpose.** Global coverage would multiply the API usage
-and the testing surface without making the idea any clearer.
-
----
-
-## Layout
-
-```
-backend/app/
-  main.py        routes
-  pipeline.py    when to fetch, and what to do when it fails
-  fetchers/      NewsAPI and Google News RSS
-  sentiment/     scoring and averaging
-  mapping/       score to weather condition
-  cache/         SQLite, TTL, daily snapshots
-
-frontend/src/
-  App.tsx        navigation state
-  components/    map, drill-down, panel, icons
-  hooks/         every backend call
-```
-
-A few modules — `pipeline.py`, `config.py`, `regions.py`, `conditions.ts` — aren't
-in the original spec. They exist to keep orchestration out of the routing table
-and to give shared constants one home instead of three.
+Or run `./dev.sh` (macOS/Linux) or `.\dev.ps1` (Windows) from the root to start both.
+Deployment steps are in `docs/deploying.md`.
