@@ -55,7 +55,17 @@ const COUNTRY_FALLBACK_ZOOM = 5;
 // the default tiles mix Latin, Cyrillic and CJK across one view. Our own markers
 // carry the only names that matter here, and a clean basemap suits a chart better
 // than a half-translated atlas.
-const TILE_URL = 'https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png';
+//
+// Since late August 2026 CARTO requires a free API key on these tiles. Without
+// one the map still works but every tile is stamped "API KEY REQUIRED", so a
+// missing key degrades to an ugly map rather than a broken one. The key isn't a
+// secret — every visitor's browser receives it in the tile URLs — which is why a
+// build-time VITE_ variable is fine here. Restrict it to your domains in CARTO's
+// dashboard so it can't be lifted and reused elsewhere.
+const CARTO_API_KEY = import.meta.env.VITE_CARTO_API_KEY ?? '';
+const TILE_URL =
+  'https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png' +
+  (CARTO_API_KEY ? `?key=${encodeURIComponent(CARTO_API_KEY)}` : '');
 const TILE_ATTRIBUTION =
   '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>';
 
