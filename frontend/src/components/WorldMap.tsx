@@ -28,6 +28,7 @@ const FLY_DURATION_SECONDS = 1.2;
 // City pins are meaningless at world zoom — they stack on top of their own
 // country pin — so the drill-down layer hides itself if you zoom back out.
 const CITY_VISIBLE_MIN_ZOOM = 4;
+
 /**
  * Per-country label nudges, in pixels.
  *
@@ -197,7 +198,7 @@ export default function WorldMap({
           // once the city layer is actually on screen to step back for.
           receded: citiesVisible && drilledInto !== country.code,
           showLabel: !(citiesVisible && drilledInto !== country.code),
-          
+          labelOffsetY: LABEL_NUDGE_PX[country.code] ?? 0,
         }),
       })),
     [countries, selectedKey, drilledInto, citiesVisible],
