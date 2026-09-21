@@ -1,0 +1,32 @@
+# Render Blueprint for the backend. Render reads this when you choose
+# New > Blueprint and point it at the repo, so the service is defined in code
+# rather than clicked together in a dashboard and forgotten.
+#
+# The frontend is deployed separately on Vercel — see docs/deploying.md.
+
+services:
+  - type: web
+    name: emotion-weather-api
+    runtime: python
+    plan: free
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    # Render assigns the port at runtime; binding anything else fails the deploy.
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    # Render restarts the service if this stops answering.
+    healthCheckPath: /api/health
+    envVars:
+      # Pinned so a platform default change can't silently move us to a Python
+      # version the dependencies haven't been tested against.
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      # The deployed frontend's origin. Set in the dashboard once the Vercel URL
+      # exists — sync: false keeps it out of this file.
+      - key: CORS_ORIGINS
+        sync: false
+      - key: CACHE_TTL_HOURS
+        value: "4"
+      - key: FETCH_DELAY_SECONDS
+        value: "1.5"
+      # Deliberately absent: NEWS_API_KEY. NewsAPI's free plan is licensed for
+      # development only, so the public deployment runs on the RSS fallback.

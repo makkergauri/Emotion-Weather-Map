@@ -197,7 +197,7 @@ export default function WorldMap({
           // once the city layer is actually on screen to step back for.
           receded: citiesVisible && drilledInto !== country.code,
           showLabel: !(citiesVisible && drilledInto !== country.code),
-          labelOffsetY: LABEL_NUDGE_PX[country.code] ?? 0,
+          
         }),
       })),
     [countries, selectedKey, drilledInto, citiesVisible],

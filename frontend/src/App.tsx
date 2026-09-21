@@ -34,6 +34,14 @@ export default function App() {
     drilledInto,
   );
 
+  // The planet mood is an average over the countries, so it goes stale the
+  // moment they change. Re-reading it alongside them keeps the header honest
+  // while the map fills in after a cold start.
+  const reloadGlobalSummary = globalSummary.reload;
+  useEffect(() => {
+    if (countries.data) reloadGlobalSummary();
+  }, [countries.data, reloadGlobalSummary]);
+
   const showingCity = selection?.kind === 'city';
   const panelResource = showingCity ? cityDetail : countryDetail;
 
@@ -76,6 +84,10 @@ export default function App() {
     crumbs.push({ label: selection.name });
   }
 
+  const reporting =
+    countries.data?.filter((c) => c.condition !== 'no_data').length ?? 0;
+  const total = countries.data?.length ?? 0;
+
   return (
     <div className="app">
       <header className="header">
@@ -104,10 +116,22 @@ export default function App() {
 
       <Legend />
 
+      {/* Three distinct waits, each explained. Someone arriving at a sleeping
+          free-tier server sees an honest reason for the delay instead of a
+          spinner that looks broken, or twelve grey pins that look finished. */}
       {countries.loading && !countries.data && (
         <p className="status">
           <span className="status__dot" />
-          Reading stations&hellip;
+          {countries.retrying
+            ? 'Waking the server \u2014 free hosting sleeps when idle, so this can take up to a minute\u2026'
+            : 'Reading stations\u2026'}
+        </p>
+      )}
+
+      {countries.data && countries.warming && (
+        <p className="status">
+          <span className="status__dot" />
+          Fetching the latest headlines &middot; {reporting}/{total} in
         </p>
       )}
 
